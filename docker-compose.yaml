@@ -76,8 +76,11 @@ x-airflow-common:
 
 services:
   postgres:
-    image: postgres:13
+    # image: postgres:13
     container_name: postgres
+    build:
+      context: ./postgres
+      dockerfile: dockerfile_postgres
     ports:
       - "5434:5432"
     env_file:
