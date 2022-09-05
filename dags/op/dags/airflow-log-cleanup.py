@@ -15,6 +15,7 @@ from airflow.configuration import conf
 from airflow.models import DAG, Variable
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
+from core.config import AIRFLOW_LOG_CLEANUP
 
 # airflow-log-cleanup
 DAG_ID = os.path.basename(__file__).replace(".pyc", "").replace(".py", "")
@@ -69,7 +70,7 @@ if ENABLE_DELETE_CHILD_LOG.lower() == "true":
         )
 
 default_args = {
-    'owner': DAG_OWNER_NAME,
+    'owner': AIRFLOW_LOG_CLEANUP.get('dag_owner_name'),
     'depends_on_past': False,
     'email': ALERT_EMAIL_ADDRESSES,
     'email_on_failure': True,
@@ -80,9 +81,9 @@ default_args = {
 }
 
 dag = DAG(
-    DAG_ID,
+    AIRFLOW_LOG_CLEANUP.get('dag_id'),
     default_args=default_args,
-    schedule_interval=SCHEDULE_INTERVAL,
+    schedule_interval=AIRFLOW_LOG_CLEANUP.get('schedule_interval'),
     start_date=START_DATE,
     tags=['teamclairvoyant', 'airflow-maintenance-dags'],
     template_undefined=jinja2.Undefined
