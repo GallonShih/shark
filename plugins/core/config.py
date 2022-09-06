@@ -28,6 +28,12 @@ AIRFLOW_LOG_CLEANUP = {
     "schedule_interval": "@daily"
 }
 
+AIRFLOW_DB_CLEANUP = {
+    "dag_owner_name": "operations",
+    "dag_id": "OP.CLEAN-airflow_db_cleanup",
+    "schedule_interval": "@daily"
+}
+
 ### ONLY ETL Related Definition
 
 ### ETL and TAG Related Definition

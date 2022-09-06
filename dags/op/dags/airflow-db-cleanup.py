@@ -18,6 +18,7 @@ try:
 except Exception as e:
     from airflow.jobs.base_job import BaseJob
 from airflow.operators.python_operator import PythonOperator
+from core.config import AIRFLOW_DB_CLEANUP
 from datetime import datetime, timedelta
 import dateutil.parser
 import logging
@@ -34,12 +35,12 @@ except ImportError:
     now = datetime.utcnow
 
 # airflow-db-cleanup
-DAG_ID = os.path.basename(__file__).replace(".pyc", "").replace(".py", "")
+# DAG_ID = os.path.basename(__file__).replace(".pyc", "").replace(".py", "")
 START_DATE = airflow.utils.dates.days_ago(1)
 # How often to Run. @daily - Once a day at Midnight (UTC)
-SCHEDULE_INTERVAL = "@daily"
+# SCHEDULE_INTERVAL = "@daily"
 # Who is listed as the owner of this DAG in the Airflow Web Server
-DAG_OWNER_NAME = "operations"
+# DAG_OWNER_NAME = "operations"
 # List of email address to send email alerts to if this job fails
 ALERT_EMAIL_ADDRESSES = []
 # Length to retain the log files if not already provided in the conf. If this
@@ -198,7 +199,7 @@ if(airflow_executor == "CeleryExecutor"):
 session = settings.Session()
 
 default_args = {
-    'owner': DAG_OWNER_NAME,
+    'owner': AIRFLOW_DB_CLEANUP.get('dag_owner_name'),
     'depends_on_past': False,
     'email': ALERT_EMAIL_ADDRESSES,
     'email_on_failure': True,
@@ -209,9 +210,9 @@ default_args = {
 }
 
 dag = DAG(
-    DAG_ID,
+    AIRFLOW_DB_CLEANUP.get('dag_id'),
     default_args=default_args,
-    schedule_interval=SCHEDULE_INTERVAL,
+    schedule_interval=AIRFLOW_DB_CLEANUP.get('schedule_interval'),
     start_date=START_DATE,
     tags=['teamclairvoyant', 'airflow-maintenance-dags']
 )

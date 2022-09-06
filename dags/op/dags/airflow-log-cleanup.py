@@ -18,16 +18,16 @@ from airflow.operators.dummy_operator import DummyOperator
 from core.config import AIRFLOW_LOG_CLEANUP
 
 # airflow-log-cleanup
-DAG_ID = os.path.basename(__file__).replace(".pyc", "").replace(".py", "")
+# DAG_ID = os.path.basename(__file__).replace(".pyc", "").replace(".py", "")
 START_DATE = airflow.utils.dates.days_ago(1)
 try:
     BASE_LOG_FOLDER = conf.get("core", "BASE_LOG_FOLDER").rstrip("/")
 except Exception as e:
     BASE_LOG_FOLDER = conf.get("logging", "BASE_LOG_FOLDER").rstrip("/")
 # How often to Run. @daily - Once a day at Midnight
-SCHEDULE_INTERVAL = "@daily"
+# SCHEDULE_INTERVAL = "@daily"
 # Who is listed as the owner of this DAG in the Airflow Web Server
-DAG_OWNER_NAME = "operations"
+# DAG_OWNER_NAME = "operations"
 # List of email address to send email alerts to if this job fails
 ALERT_EMAIL_ADDRESSES = []
 # Length to retain the log files if not already provided in the conf. If this
