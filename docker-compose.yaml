@@ -65,6 +65,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
+    - ./airflow.cfg:/opt/airflow/airflow.cfg
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -75,8 +76,11 @@ x-airflow-common:
 
 services:
   postgres:
-    image: postgres:13
+    # image: postgres:13
     container_name: postgres
+    build:
+      context: ./postgres
+      dockerfile: dockerfile_postgres
     ports:
       - "5434:5432"
     env_file:
