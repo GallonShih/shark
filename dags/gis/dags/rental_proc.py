@@ -8,7 +8,7 @@ from libs.gis.get_rentals import RentalsGetting
 from core.config import GIS_RENTAL_GET
 
 default_args = {
-    'start_date': datetime(2022, 9, 10),
+    'start_date': datetime(2022, 9, 8),
     'retries': 2,
     'retry_delay': timedelta(minutes=5),
     "gis_db_conn_id": "gis_postgres",
