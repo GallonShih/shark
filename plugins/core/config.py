@@ -35,5 +35,11 @@ AIRFLOW_DB_CLEANUP = {
 }
 
 ### ONLY ETL Related Definition
+GIS_RENTAL_GET = {
+    "dag_owner_name": "Gallon",
+    "dag_id": "ETL-rental_info",
+    "schedule_interval": "@daily"
+}
+
 
 ### ETL and TAG Related Definition

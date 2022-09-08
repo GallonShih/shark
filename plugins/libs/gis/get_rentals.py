@@ -67,7 +67,7 @@ class RentalsGetting:
         total_page = int(res.json()['records'].replace(',', ''))//30+1
         cookies = session.cookies
         return total_page, cookies
-    
+
     async def _get_rentals_by_page(self, session, region_id: int, page: int):
         """
         :param session: a request session
@@ -138,7 +138,7 @@ class RentalsGetting:
                             chunksize=1000)
         logger.info('Finish insert into rental.rentals.')
         logger.info('Finish saving to db.')
-    
+
     def execute(self):
         self._get_rentals_all()
         self._rentals_to_do()
