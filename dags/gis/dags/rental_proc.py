@@ -11,13 +11,13 @@ default_args = {
     'start_date': datetime(2022, 9, 8),
     'retries': 2,
     'retry_delay': timedelta(minutes=5),
-    "gis_db_conn_id": "gis_postgres",
-    "owner": GIS_RENTAL_GET.get("dag_owner_name"),
+    'gis_db_conn_id': 'gis_postgres',
+    'owner': GIS_RENTAL_GET.get('dag_owner_name'),
 }
 
 dag = DAG(
-    GIS_RENTAL_GET.get("dag_id"),
-    schedule_interval=GIS_RENTAL_GET.get("schedule_interval"),
+    GIS_RENTAL_GET.get('dag_id'),
+    schedule_interval=GIS_RENTAL_GET.get('schedule_interval'),
     default_args=default_args,
     catchup=False,
     params={
@@ -26,7 +26,7 @@ dag = DAG(
 
 class GetRentals(BaseOperator):
     @apply_defaults
-    def __inti__(
+    def __init__(
         self,
         gis_db_conn_id,
         *args,
