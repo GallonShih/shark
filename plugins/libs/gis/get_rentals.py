@@ -2,7 +2,7 @@
 
 import pandas as pd
 import requests
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientTimeout, TCPConnector
 import asyncio
 import nest_asyncio
 from bs4 import BeautifulSoup
@@ -98,7 +98,9 @@ class RentalsGetting:
         headers['X-CSRF-TOKEN'] = token
 
         async def get_rentals_all_pages():
-            async with ClientSession(headers=headers, cookies=cookies) as session:
+            timeout = ClientTimeout(600)
+            connector = TCPConnector(limit=50)
+            async with ClientSession(connector=connector, timeout=timeout, headers=headers, cookies=cookies) as session:
                 tasks = [asyncio.create_task(self._get_rentals_by_page(
                     session=session, region_id=region_id, page=page)) for page in range(1, total_page+1)]
                 await asyncio.gather(*tasks)
