@@ -54,7 +54,7 @@ class GetRentalsDetail(BaseOperator):
         *args,
         **kwargs
     ):
-        super(GetRentals, self).__init__(*args, **kwargs)
+        super(GetRentalsDetail, self).__init__(*args, **kwargs)
         self.gis_db_conn_id = gis_db_conn_id
 
     def execute(self, context):
@@ -70,7 +70,7 @@ with dag:
     get_rentals = GetRentals(
         task_id='get_rentals'
     )
-    get_rentals_detail = GetRentals(
+    get_rentals_detail = GetRentalsDetail(
         task_id='get_rentals_detail'
     )
     get_rentals >> get_rentals_detail
