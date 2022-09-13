@@ -128,12 +128,14 @@ class RentalsDetailGetting:
         headers['X-CSRF-TOKEN'] = token
         headers['deviceid'] = cookies.get_dict()['T591_TOKEN']
         headers['device'] = 'pc'
+        logger.info('Start using api to get detail.')
         for idx, data in self.df_rentals.iterrows():
             res = self._use_rental_detail_api(session=session, headers=headers, id=data.post_id)
             self._parse_response(res=res, id=data.post_id)
             time.sleep(random.random())
-            if (idx+1) % 1 == 1000:
+            if (idx+1) % 200 == 0:
                 logger.info(f'Finish number: {(idx+1)}')
+        logger.info('Finish using api to get detail.')
         logger.info('Finish getting rentals detail all.')
 
     def _rentails_detail_to_db(self):
@@ -150,7 +152,7 @@ class RentalsDetailGetting:
             con.execute("""
                 SET SESSION timezone TO 'Asia/Taipei';
                 DELETE FROM rental.rentals_detail
-                WHERE updated_dt::DATE = current_date;
+                WHERE updated_time::DATE = current_date;
             """)
         logger.info('Finish deleting today data.')
         logger.info('Start inserting new today data.')
