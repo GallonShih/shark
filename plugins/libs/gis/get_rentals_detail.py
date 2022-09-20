@@ -5,8 +5,11 @@ import requests
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
+from sqlalchemy.types import BigInteger, INTEGER, VARCHAR, DATE, NUMERIC, TEXT
 import geopandas as gpd
 from shapely.geometry import Point
+import datetime
+import pytz
 import time
 import random
 import logging
@@ -42,6 +45,13 @@ class RentalsDetailGetting:
         self.df_rentals = pd.read_sql("""
             SELECT f1.post_id, f1.title, f1.region_id
             FROM rental.rentals f1
+            WHERE NOT EXISTS
+            (
+                SELECT f2.post_id
+                FROM rental.rentals_detail f2
+                WHERE f1.post_id = f2.post_id
+            )
+            AND f1.end_date IS NULL
         """, con=self.rental_conn)
     
     def _get_token(self, session):
@@ -142,27 +152,39 @@ class RentalsDetailGetting:
         """
         Save rentals_detail to gis-db
         """
-        logger.info('Start Saving to gid-db.')
+        logger.info('Start Saving to gis-db.')
         geom = [Point(data.lon, data.lat) for idx, data in self.df_rentals_detail.iterrows()]
         self.df_rentals_detail = gpd.GeoDataFrame(self.df_rentals_detail, crs='epsg:4326', geometry=geom)
         self.df_rentals_detail = self.df_rentals_detail.drop(columns=['lon', 'lat']).rename(columns={'geometry': 'coordinates'})
         self.df_rentals_detail.set_geometry('coordinates', inplace=True)
-        logger.info('Start deleting today data.')
-        with self.rental_conn.connect() as con:
-            con.execute("""
-                SET SESSION timezone TO 'Asia/Taipei';
-                DELETE FROM rental.rentals_detail
-                WHERE updated_time::DATE = current_date;
-            """)
-        logger.info('Finish deleting today data.')
         logger.info('Start inserting new today data.')
+        _tw = pytz.timezone('Asia/Taipei')
+        today_date = datetime.datetime.now(tz=_tw).date()
+        self.df_rentals_detail['update_date'] = today_date
+        df_rentals_detail_type = {
+            'post_id': BigInteger,
+            'title': VARCHAR(128),
+            'countyname': VARCHAR(3),
+            'townname': VARCHAR(5),
+            'tags': VARCHAR(128),
+            'price': INTEGER,
+            'price_unit': VARCHAR(10),
+            'kind': VARCHAR(10),
+            'area': NUMERIC,
+            'address': VARCHAR(128),
+            'desc': VARCHAR(128),
+            'rule': VARCHAR(128),
+            'content': TEXT,
+            'update_date': DATE
+        }
         self.df_rentals_detail.to_postgis(name='rentals_detail',
                                         con=self.rental_conn,
                                         schema='rental',
                                         if_exists='append',
-                                        index=False)
-        logger.info('Finish inserting new today data.')
-        logger.info('Finish Saving to gid-db.')
+                                        index=False,
+                                        dtype=df_rentals_detail_type,)
+        logger.info(f'Finish inserting new today data. Date: {today_date}')
+        logger.info('Finish Saving to gis-db.')
 
     def execute(self):
         self._get_rentals_detail_all()

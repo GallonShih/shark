@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+import datetime
+import pytz
 import requests
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
 import asyncio
 import nest_asyncio
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
-from sqlalchemy.types import BigInteger, INTEGER, VARCHAR
+from sqlalchemy.types import BigInteger, INTEGER, VARCHAR, DATE
 import logging
 
 nest_asyncio.apply()
@@ -31,7 +33,7 @@ class RentalsGetting:
         self.df_rentals = pd.DataFrame(columns=['post_id', 'title', 'region_id'])
         logger.info(f"""
             =============================================================
-            Let's start to get rentals' id from 590.com.
+            Let's start to get rentals' id from 591.com.
             The regions are {self.region_ids}. 
             =============================================================
         """)
@@ -119,18 +121,22 @@ class RentalsGetting:
     def _rentals_to_do(self):
         logger.info('Start saving to db.')
         with self.rental_conn.connect() as con:
-            logger.info('Start truncating rental.rentals.')
+            logger.info('Start truncating rental.rentals_daily.')
             con.execute("""
-                TRUNCATE TABLE rental.rentals
+                TRUNCATE TABLE rental.rentals_daily
             """)
-            logger.info('Finish truncating rental.rentals.')
+            logger.info('Finish truncating rental.rentals_daily.')
         df_rentals_type = {
             'post_id': BigInteger,
             'title': VARCHAR(128),
-            'region_id': INTEGER
+            'region_id': INTEGER,
+            'update_date': DATE
         }
-        logger.info('Start insert into rental.rentals.')
-        self.df_rentals.to_sql(name='rentals',
+        logger.info('Start insert into rental.rentals_daily.')
+        _tw = pytz.timezone('Asia/Taipei')
+        today_date = datetime.datetime.now(tz=_tw).date()
+        self.df_rentals['update_date'] = today_date
+        self.df_rentals.to_sql(name='rentals_daily',
                             schema='rental',
                             if_exists='append',
                             index=False,
@@ -138,7 +144,7 @@ class RentalsGetting:
                             con=self.rental_conn,
                             method='multi',
                             chunksize=1000)
-        logger.info('Finish insert into rental.rentals.')
+        logger.info(f'Finish insert into rental.rentals_daily. Date: {today_date}')
         logger.info('Finish saving to db.')
 
     def execute(self):

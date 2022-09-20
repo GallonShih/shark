@@ -5,6 +5,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.models import BaseOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from libs.gis.get_rentals import RentalsGetting
+from libs.gis.update_rentals import RentalsUpdating
 from libs.gis.get_rentals_detail import RentalsDetailGetting
 from core.config import GIS_RENTAL_GET
 
@@ -46,6 +47,26 @@ class GetRentals(BaseOperator):
         )
         proc.execute()
 
+class UpdateRentals(BaseOperator):
+    @apply_defaults
+    def __init__(
+        self,
+        gis_db_conn_id,
+        *args,
+        **kwargs
+    ):
+        super(UpdateRentals, self).__init__(*args, **kwargs)
+        self.gis_db_conn_id = gis_db_conn_id
+
+    def execute(self, context):
+        db_hook = PostgresHook(self.gis_db_conn_id)
+        gis_db_conn = db_hook.get_sqlalchemy_engine()
+
+        proc = RentalsUpdating(
+            rental_conn=gis_db_conn
+        )
+        proc.execute()
+
 class GetRentalsDetail(BaseOperator):
     @apply_defaults
     def __init__(
@@ -70,7 +91,10 @@ with dag:
     get_rentals = GetRentals(
         task_id='get_rentals'
     )
+    update_rentals = UpdateRentals(
+        task_id='update_rentals'
+    )
     get_rentals_detail = GetRentalsDetail(
         task_id='get_rentals_detail'
     )
-    get_rentals >> get_rentals_detail
+    get_rentals >> update_rentals >> get_rentals_detail
