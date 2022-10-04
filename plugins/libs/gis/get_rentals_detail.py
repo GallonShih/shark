@@ -73,7 +73,7 @@ class RentalsDetailGetting:
         """
         url = self.GET_DETAIL_URL + str(id)
         try:
-            res = session.get(url, headers=headers, timeout=5)
+            res = session.get(url, headers=headers, timeout=10)
         except :
             logger.info(f'This id {id} is not available.')
             res = None
@@ -130,8 +130,8 @@ class RentalsDetailGetting:
         self._read_rentals()
         logger.info(f'Finish getting all post id: {len(self.df_rentals)}.')
         session = requests.Session()
-        session.mount('http://', HTTPAdapter(max_retries=3))
-        session.mount('https://', HTTPAdapter(max_retries=3))
+        session.mount('http://', HTTPAdapter(max_retries=5))
+        session.mount('https://', HTTPAdapter(max_retries=5))
         token = self._get_token(session=session)
         cookies = session.cookies
         headers = self.HEADERS.copy()
