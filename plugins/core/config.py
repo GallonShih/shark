@@ -41,5 +41,10 @@ GIS_RENTAL_GET = {
     "schedule_interval": "@daily"
 }
 
+MIRROR_TABLE_TO_REMOTE = {
+    "dag_owner_name": "Gallon",
+    "dag_id": "ETL-mirror_table",
+    "schedule_interval": None
+}
 
 ### ETL and TAG Related Definition
