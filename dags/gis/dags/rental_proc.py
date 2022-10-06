@@ -8,6 +8,7 @@ from libs.gis.get_rentals import RentalsGetting
 from libs.gis.update_rentals import RentalsUpdating
 from libs.gis.get_rentals_detail import RentalsDetailGetting
 from libs.gis.mirror_rentals_daily import RentalsDailyMirroring
+from libs.gis.update_rentals_detail import RentalsDetailUpdating
 from core.config import GIS_RENTAL_GET
 
 default_args = {
@@ -134,6 +135,31 @@ class UpdateRentalsRemote(BaseOperator):
         )
         proc.execute()
 
+class UpdateRentalsDetail(BaseOperator):
+    @apply_defaults
+    def __init__(
+        self,
+        gis_db_conn_id,
+        remote_gis_conn_id,
+        *args,
+        **kwargs
+    ):
+        super(UpdateRentalsDetail, self).__init__(*args, **kwargs)
+        self.gis_db_conn_id = gis_db_conn_id
+        self.remote_gis_conn_id = remote_gis_conn_id
+    
+    def execute(self, context):
+        db_hook = PostgresHook(self.gis_db_conn_id)
+        gis_db_conn = db_hook.get_sqlalchemy_engine()
+        db_hook = PostgresHook(self.remote_gis_conn_id)
+        remote_gis_conn = db_hook.get_sqlalchemy_engine()
+
+        proc = RentalsDetailUpdating(
+            rental_conn=gis_db_conn,
+            remote_conn=remote_gis_conn
+        )
+        proc.execute()
+
 with dag:
     get_rentals = GetRentals(
         task_id='get_rentals'
@@ -150,6 +176,10 @@ with dag:
     update_rentals_remote = UpdateRentalsRemote(
         task_id='update_rentals_remote'
     )
+    update_rentals_detail = UpdateRentalsDetail(
+        task_id='update_rentals_detail_remote'
+    )
     get_rentals >> [update_rentals, mirror_rentals_daily]
     update_rentals >> get_rentals_detail
     mirror_rentals_daily >> update_rentals_remote
+    [get_rentals_detail, update_rentals_remote] >> update_rentals_detail
