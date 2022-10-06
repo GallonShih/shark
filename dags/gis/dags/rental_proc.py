@@ -7,6 +7,7 @@ from airflow.hooks.postgres_hook import PostgresHook
 from libs.gis.get_rentals import RentalsGetting
 from libs.gis.update_rentals import RentalsUpdating
 from libs.gis.get_rentals_detail import RentalsDetailGetting
+from libs.gis.mirror_rentals_daily import RentalsDailyMirroring
 from core.config import GIS_RENTAL_GET
 
 default_args = {
@@ -14,6 +15,7 @@ default_args = {
     'retries': 2,
     'retry_delay': timedelta(minutes=5),
     'gis_db_conn_id': 'gis_postgres',
+    'remote_gis_conn_id': 'gis_ec2',
     'owner': GIS_RENTAL_GET.get('dag_owner_name'),
 }
 
@@ -87,6 +89,51 @@ class GetRentalsDetail(BaseOperator):
         )
         proc.execute()
 
+class MirrorRentalsDaily(BaseOperator):
+    @apply_defaults
+    def __init__(
+        self,
+        gis_db_conn_id,
+        remote_gis_conn_id,
+        *args,
+        **kwargs
+    ):
+        super(MirrorRentalsDaily, self).__init__(*args, **kwargs)
+        self.gis_db_conn_id = gis_db_conn_id
+        self.remote_gis_conn_id = remote_gis_conn_id
+    
+    def execute(self, context):
+        db_hook = PostgresHook(self.gis_db_conn_id)
+        gis_db_conn = db_hook.get_sqlalchemy_engine()
+        db_hook = PostgresHook(self.remote_gis_conn_id)
+        remote_gis_conn = db_hook.get_sqlalchemy_engine()
+
+        proc = RentalsDailyMirroring(
+            rental_conn=gis_db_conn,
+            remote_conn=remote_gis_conn
+        )
+        proc.execute()
+
+class UpdateRentalsRemote(BaseOperator):
+    @apply_defaults
+    def __init__(
+        self,
+        remote_gis_conn_id,
+        *args,
+        **kwargs
+    ):
+        super(UpdateRentalsRemote, self).__init__(*args, **kwargs)
+        self.remote_gis_conn_id = remote_gis_conn_id
+
+    def execute(self, context):
+        db_hook = PostgresHook(self.remote_gis_conn_id)
+        remote_gis_conn = db_hook.get_sqlalchemy_engine()
+
+        proc = RentalsUpdating(
+            rental_conn=remote_gis_conn
+        )
+        proc.execute()
+
 with dag:
     get_rentals = GetRentals(
         task_id='get_rentals'
@@ -97,4 +144,12 @@ with dag:
     get_rentals_detail = GetRentalsDetail(
         task_id='get_rentals_detail'
     )
-    get_rentals >> update_rentals >> get_rentals_detail
+    mirror_rentals_daily = MirrorRentalsDaily(
+        task_id='mirror_rentals_daily'
+    )
+    update_rentals_remote = UpdateRentalsRemote(
+        task_id='update_rentals_remote'
+    )
+    get_rentals >> [update_rentals, mirror_rentals_daily]
+    update_rentals >> get_rentals_detail
+    mirror_rentals_daily >> update_rentals_remote
