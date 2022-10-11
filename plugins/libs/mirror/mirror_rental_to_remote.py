@@ -15,7 +15,7 @@ class RentalMirroring:
         """
         self.rental_conn = rental_conn
         self.remote_conn = remote_conn
-    
+
     def _create_table(self):
         """
         Create rental.rentals, rental.rentals_daily, rental.rentals_detail in gis in remote cloud service.
@@ -90,7 +90,7 @@ class RentalMirroring:
             """)
             logger.info('Finish creating rental.rentals_detail.')
         logger.info('Finish creating tables in rental.')
-    
+
     def _mirror_rentals(self):
         """
         Mirror rental.rentals from local to remote cloud service.
@@ -121,7 +121,7 @@ class RentalMirroring:
                         con=self.remote_conn)
         logger.info('Finish updating rentals to remote cloud service.')
         logger.info('Finish mirroring rentals.')
-    
+
     def _mirror_rentals_daily(self):
         """
         Mirror rental.rentals_daily from local to remote cloud service.
@@ -150,7 +150,7 @@ class RentalMirroring:
                         con=self.remote_conn)
         logger.info('Finish updating rentals_daily to remote cloud service.')
         logger.info('Finish mirroring rentals_daily.')
-    
+
     def _mirror_rentals_detail(self):
         """
         Mirror rental.rentals_detail from local to remote cloud service.
@@ -189,7 +189,7 @@ class RentalMirroring:
                         con=self.remote_conn)
         logger.info('Finish updating rentals_detail to remote cloud service.')
         logger.info('Finish mirroring rentals_detail.')
-    
+
     def execute(self):
         self._create_table()
         self._mirror_rentals()
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     logger.setLevel('DEBUG')
     logger.addHandler(chlr)
     rental_conn = create_engine("postgresql://airflow:airflow@127.0.0.1:5434/gis")
-    remote_conn = create_engine("postgresql://postgres:postgres@35.78.72.189:5432/gis")
+    remote_conn = create_engine("postgresql://***:***@***/gis")
 
     # RentalMirroring
     op = RentalMirroring(rental_conn=rental_conn, remote_conn=remote_conn)

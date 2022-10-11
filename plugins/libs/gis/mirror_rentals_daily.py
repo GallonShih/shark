@@ -26,7 +26,7 @@ class RentalsDailyMirroring:
                 TRUNCATE TABLE rental.rentals_daily
             """)
         logger.info('Finish truncating rental.rentals_daily in remote.')
-    
+
     def _mirror_rentals_daily(self):
         """
         Mirror rental.rentals_daily from local to remote cloud service.
@@ -55,7 +55,7 @@ class RentalsDailyMirroring:
                         con=self.remote_conn)
         logger.info('Finish updating rentals_daily to remote cloud service.')
         logger.info('Finish mirroring rentals_daily.')
-    
+
     def execute(self):
         self._truncate_table()
         self._mirror_rentals_daily()
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     logger.setLevel('DEBUG')
     logger.addHandler(chlr)
     rental_conn = create_engine("postgresql://airflow:airflow@127.0.0.1:5434/gis")
-    remote_conn = create_engine("postgresql://postgres:postgres@35.78.72.189:5432/gis")
+    remote_conn = create_engine("postgresql://***:***@***/gis")
 
     # RentalsDailyMirroring
     op = RentalsDailyMirroring(rental_conn=rental_conn, remote_conn=remote_conn)

@@ -11,7 +11,7 @@ class RentalsUpdating:
     def __init__(self, rental_conn):
         self.rental_conn =rental_conn
         self.today_date = self._get_today()
-    
+
     def _get_today(self):
         _tw = pytz.timezone('Asia/Taipei')
         today_date = datetime.datetime.now(tz=_tw).date()
@@ -34,7 +34,7 @@ class RentalsUpdating:
         with self.rental_conn.connect() as con:
             con.execute(rentals_query)
         logger.info('Finish inserting new rentals into rental.rentals.')
-    
+
     def _update_end_date(self):
         logger.info('Start updating end date in rental.rentals.')
         rentals_query = f"""
@@ -66,7 +66,7 @@ class RentalsUpdating:
         with self.rental_conn.connect() as con:
             con.execute(rentals_query)
         logger.info('Finish updating re-open or mistake rentals.')
-    
+
     def execute(self):
         self._insert_new()
         self._update_end_date()

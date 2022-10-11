@@ -21,7 +21,7 @@ class RentalsDetailUpdating:
         logger.info(f"""
             Start updating {self.today_date} rental.rentals_detail.
         """)
-    
+
     def _get_rentals_detail(self):
         """
         Get data from rentals_detail of specific date.
@@ -35,7 +35,7 @@ class RentalsDetailUpdating:
         """, con=self.rental_conn)
         logger.info(f'Finish getting rentals_detail from local {df_rentals_detail.shape}.')
         return df_rentals_detail
-    
+
     def _update_to_remote(self, df_rentals_detail):
         """
         Update rentals_detail in remote.
@@ -76,7 +76,7 @@ class RentalsDetailUpdating:
                                 con=self.remote_conn)
         logger.info(f'Finish inserting new today data. Date: {self.today_date}')
         logger.info('Finish updating to remote.')
-    
+
     def execute(self):
         df_rentals_detail = self._get_rentals_detail()
         self._update_to_remote(df_rentals_detail=df_rentals_detail)
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     logger.setLevel('DEBUG')
     logger.addHandler(chlr)
     rental_conn = create_engine("postgresql://airflow:airflow@127.0.0.1:5434/gis")
-    remote_conn = create_engine("postgresql://postgres:postgres@35.78.72.189:5432/gis")
+    remote_conn = create_engine("postgresql://***:***@***/gis")
 
     # RentalsDetailUpdating
     op = RentalsDetailUpdating(rental_conn=rental_conn, remote_conn=remote_conn)

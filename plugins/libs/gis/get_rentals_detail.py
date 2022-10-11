@@ -37,7 +37,7 @@ class RentalsDetailGetting:
             Let's start to get rentals-detail from 591.com.
             =============================================================
         """)
-    
+
     def _read_rentals(self):
         """
         Get all rentals' post id that want to use api to get detail.
@@ -53,7 +53,7 @@ class RentalsDetailGetting:
             )
             AND f1.end_date IS NULL
         """, con=self.rental_conn)
-    
+
     def _get_token(self, session):
         """
         :param session: a request session
@@ -78,7 +78,7 @@ class RentalsDetailGetting:
             logger.info(f'This id {id} is not available.')
             res = None
         return res
-    
+
     def _parse_response(self, res, id):
         """
         Parse the response from 591.com api and format it to dataframe.
@@ -120,7 +120,7 @@ class RentalsDetailGetting:
             except:
                 logger.info(f'Can not get detail from {id}')
                 pass
-    
+
     def _get_rentals_detail_all(self):
         """
         Get all rentals's detail after using 591.com api
