@@ -7,6 +7,14 @@ It is a side-project, using `Airflow` to maintain the data demand and manage the
 
 ---
 
+## Framework
+
+<img src='./pics/shark_framework.jpg' width="100%">
+
+### Ready Data
+- Houses for Rent
+---
+
 ## Tag Definition
 
 - 格式：`v{Large Version}.{Feature Version}.{Hotfix Version}` (Ex: v1.1.1)

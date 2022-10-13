@@ -35,5 +35,16 @@ AIRFLOW_DB_CLEANUP = {
 }
 
 ### ONLY ETL Related Definition
+GIS_RENTAL_GET = {
+    "dag_owner_name": "Gallon",
+    "dag_id": "ETL-rental_info",
+    "schedule_interval": "@daily"
+}
+
+MIRROR_TABLE_TO_REMOTE = {
+    "dag_owner_name": "Gallon",
+    "dag_id": "ETL-mirror_table",
+    "schedule_interval": None
+}
 
 ### ETL and TAG Related Definition
