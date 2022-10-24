@@ -1,6 +1,7 @@
 
 from datetime import datetime, timedelta
 from textwrap import dedent
+from libs.utils.slack import slack_fail_alert, slack_success_alert
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG
@@ -25,8 +26,8 @@ with DAG(
         # 'wait_for_downstream': False,
         # 'sla': timedelta(hours=2),
         # 'execution_timeout': timedelta(seconds=300),
-        # 'on_failure_callback': some_function,
-        # 'on_success_callback': some_other_function,
+        'on_failure_callback': slack_fail_alert,
+        # 'on_success_callback': slack_success_alert,
         # 'on_retry_callback': another_function,
         # 'sla_miss_callback': yet_another_function,
         # 'trigger_rule': 'all_success'
