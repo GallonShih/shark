@@ -5,6 +5,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.models import BaseOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from libs.mirror.mirror_rental_to_remote import RentalMirroring
+from libs.utils.slack import slack_fail_alert
 from core.config import MIRROR_TABLE_TO_REMOTE
 
 default_args = {
@@ -14,6 +15,7 @@ default_args = {
     'gis_db_conn_id': 'gis_postgres',
     'remote_gis_conn_id': 'gis_ec2',
     'owner': MIRROR_TABLE_TO_REMOTE.get('dag_owner_name'),
+    'on_failure_callback': slack_fail_alert,
 }
 
 dag = DAG(

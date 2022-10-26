@@ -26,7 +26,8 @@ def slack_fail_alert(context):
         :x: Task Failed.
         *Task*: {context.get('task_instance').task_id}
         *Dag*: {context.get('task_instance').dag_id}
-        *Execution Time*: {convert_datetime(context.get('execution_date'))}
+        *Execution Time*: {convert_datetime(context.get('logical_date'))}
+        *Exception*: {context.get('exception')}
         <{context.get('task_instance').log_url}|*Logs*>
     """
 
@@ -56,7 +57,7 @@ def slack_success_alert(context):
         :o: Task Successed.
         *Task*: {context.get('task_instance').task_id}
         *Dag*: {context.get('task_instance').dag_id}
-        *Execution Time*: {convert_datetime(context.get('execution_date'))}
+        *Execution Time*: {convert_datetime(context.get('logical_date'))}
         <{context.get('task_instance').log_url}|*Logs*>
     """
 

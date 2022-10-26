@@ -1,7 +1,7 @@
 
 from datetime import datetime, timedelta
 from textwrap import dedent
-from libs.utils.slack import slack_fail_alert, slack_success_alert
+from libs.utils.slack import slack_fail_alert
 
 # The DAG object; we'll need this to instantiate a DAG
 from airflow import DAG

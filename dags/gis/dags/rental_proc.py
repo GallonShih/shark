@@ -9,7 +9,7 @@ from libs.gis.update_rentals import RentalsUpdating
 from libs.gis.get_rentals_detail import RentalsDetailGetting
 from libs.gis.mirror_rentals_daily import RentalsDailyMirroring
 from libs.gis.update_rentals_detail import RentalsDetailUpdating
-from libs.utils.slack import slack_fail_alert, slack_success_alert
+from libs.utils.slack import slack_fail_alert
 from core.config import GIS_RENTAL_GET
 
 default_args = {
@@ -20,7 +20,6 @@ default_args = {
     'remote_gis_conn_id': 'gis_ec2',
     'owner': GIS_RENTAL_GET.get('dag_owner_name'),
     'on_failure_callback': slack_fail_alert,
-    # 'on_success_callback': slack_success_alert,
 }
 
 dag = DAG(

@@ -26,6 +26,7 @@ import os
 from sqlalchemy import func, and_
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import load_only
+from libs.utils.slack import slack_fail_alert
 
 try:
     # airflow.utils.timezone is available from v1.10 onwards
@@ -206,7 +207,8 @@ default_args = {
     'email_on_retry': False,
     'start_date': START_DATE,
     'retries': 1,
-    'retry_delay': timedelta(minutes=1)
+    'retry_delay': timedelta(minutes=1),
+    'on_failure_callback': slack_fail_alert,
 }
 
 dag = DAG(
