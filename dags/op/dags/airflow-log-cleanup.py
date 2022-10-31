@@ -15,6 +15,7 @@ from airflow.configuration import conf
 from airflow.models import DAG, Variable
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
+from libs.utils.slack import slack_fail_alert
 from core.config import AIRFLOW_LOG_CLEANUP
 
 # airflow-log-cleanup
@@ -77,7 +78,8 @@ default_args = {
     'email_on_retry': False,
     'start_date': START_DATE,
     'retries': 1,
-    'retry_delay': timedelta(minutes=1)
+    'retry_delay': timedelta(minutes=1),
+    'on_failure_callback': slack_fail_alert,
 }
 
 dag = DAG(
